@@ -7,10 +7,7 @@ async function loadTool(action) {
         return;
     }
 
-    area.innerHTML = `<div style="text-align: center; padding: 50px;">
-                        <div class="spinner"></div>
-                        <h3>Fetching ${action} for ${topic}... 🧠</h3>
-                      </div>`;
+    area.innerHTML = `<h3>Generating... ⏳</h3>`;
 
     try {
         const response = await fetch('/ai-action', {
@@ -30,6 +27,6 @@ async function loadTool(action) {
                 </div>
             </div>`;
     } catch (error) {
-        area.innerHTML = `<p style="color: #ff6b6b;">Error: Could not reach the server. Make sure your Flask app is running!</p>`;
+        area.innerHTML = `<p>Error: Could not connect to the server.</p>`;
     }
 }
