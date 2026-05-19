@@ -1,53 +1,66 @@
 import os
 from flask import Flask, render_template, request, jsonify
+from dotenv import load_dotenv
 from groq import Groq
+
+# 1. Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Initialize the Groq client
-# Initialize the Groq client
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+# 2. Get API key and initialize client
+api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    print("---------------------------------------------------------")
+    print("ERROR: GROQ_API_KEY not found in .env file!")
+    print("Please ensure .env is in the same folder as app.py")
+    print("---------------------------------------------------------")
+    client = None
+else:
+    client = Groq(api_key=api_key)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/ai-action', methods=['POST'])
-def ai_action():
-    data = request.json
-    action = data.get('type')
-    topic = data.get('topic')
-    
-    # Custom prompts for engineering students
-    prompts = {
-        "plan": f"Create a structured 7-day study plan for '{topic}' for an engineering student. Use bullet points.",
-        "quiz": f"Create 5 challenging multiple-choice questions on '{topic}' with the correct answers clearly listed at the bottom.",
-        "summary": f"Provide a comprehensive, technical summary of '{topic}' including key formulas and concepts.",
-        "resources": f"Suggest 3 high-quality educational YouTube channels, 2 recommended textbooks, and 1 website for mastering '{topic}'."
-    }
-    
-    selected_prompt = prompts.get(action, f"Explain {topic}")
-    
-    try:
-        # Calling Groq's Llama 3 model (Free and fast)
-       # Change the model to the current standard
-        chat_completion = client.chat.completions.create(
-    messages=[
-        {"role": "system", "content": "You are a helpful and intelligent AI tutor for engineering students."},
-        {"role": "user", "content": selected_prompt}
-    ],
-    model="llama-3.3-70b-versatile", 
-)
+@app.route('/generate', methods=['POST'])
+def generate():
+    # Check if client was initialized
+    if client is None:
+        return jsonify({"result": "Error: API Key is missing. Check your .env file."}), 500
 
+    try:
+        data = request.get_json()
+        topic = data.get('topic')
+        prompt_type = data.get('type')
         
+        if not topic:
+            return jsonify({"result": "Please enter a topic!"}), 400
+
+        # AI Prompts
+        prompts = {
+            "timetable": f"Create a structured 7-day study timetable for {topic}.",
+            "quiz": f"Generate 5 quiz questions with answers for {topic}.",
+            "summary": f"Provide a clear, concise summary of {topic}.",
+            "resources": f"List 5 essential concepts and resources to master {topic}."
+        }
+
+        # API Call to Groq
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "You are a professional Engineering Tutor."},
+                {"role": "user", "content": prompts.get(prompt_type, "Explain " + topic)}
+            ],
+            model="llama-3.3-70b-versatile",
+        )
+
         result = chat_completion.choices[0].message.content
         return jsonify({"result": result})
-        
-    except Exception as e:
-        return jsonify({"result": f"Error: {str(e)}"})
 
-# Change the end of app.py to this:
+    except Exception as e:
+        print("ERROR IN GENERATE:", str(e))
+        return jsonify({"result": f"AI Error: {str(e)}"}), 500
+
 if __name__ == '__main__':
-    # Do not call app.run() here. 
-    # Gunicorn handles it for you.
-    pass
+    app.run(debug=True)

@@ -2,26 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Study Buddy 📚</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
+    <title>Study Buddy</title>
+    <!-- We use the absolute path to ensure it loads -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
 <body>
-    <!-- Inside the Sidebar of index.html -->
-<div class="sidebar">
-    <h2>Study Buddy 🚀</h2>
-    <button class="nav-btn" onclick="loadTool('plan')">📅 Study Plan</button>
-    <button class="nav-btn" onclick="loadTool('quiz')">📝 Take Quiz</button>
-    <button class="nav-btn" onclick="loadTool('summary')">📖 Summary</button>
-    <button class="nav-btn" onclick="loadTool('resources')">🔗 Resources</button>
-</div>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h2 style="color: #a78bfa;">Study Buddy 📚</h2>
+            <button class="btn-tool" onclick="fetchAI('timetable')">📅 Timetable</button>
+            <button class="btn-tool" onclick="fetchAI('quiz')">📝 Practice Quiz</button>
+            <button class="btn-tool" onclick="fetchAI('summary')">📖 Quick Summary</button>
+            <button class="btn-tool" onclick="fetchAI('resources')">💡 Key Concepts</button>
+        </aside>
 
-    <div class="main-content">
-        <input type="text" id="topic" placeholder="Enter engineering topic (e.g., Fluid Mechanics)...">
-        <div id="display-area" class="content-box">
-            <p>Welcome! Enter a topic, then select an option from the sidebar to begin. 🎓</p>
-        </div>
+        <main class="content-area">
+            <h1>Engineer's Dashboard</h1>
+            <input type="text" id="topic" placeholder="Enter engineering topic...">
+            <div id="loader" style="display:none; color: #a78bfa; margin-top:10px;">Analyzing... ✨</div>
+            <div id="output" class="output-box">Your study content will appear here.</div>
+        </main>
     </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
