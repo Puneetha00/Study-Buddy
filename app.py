@@ -30,7 +30,7 @@ def ai_action():
     
     try:
         # Calling Groq's Llama 3 model (Free and fast)
-        # Change the model to the current standard
+       # Change the model to the current standard
         chat_completion = client.chat.completions.create(
     messages=[
         {"role": "system", "content": "You are a helpful and intelligent AI tutor for engineering students."},
@@ -38,6 +38,7 @@ def ai_action():
     ],
     model="llama-3.3-70b-versatile", 
 )
+
         
         result = chat_completion.choices[0].message.content
         return jsonify({"result": result})
